@@ -1,0 +1,24 @@
+README
+======
+
+adl is a tool for recording system administration commands in a fully
+replayable manner. All syadmin actions are logged to the /root/LOG file.
+
+See the announcement for background info and usage instructions:
+
+  http://effectif.com/2008/4/06/automate-your-sysadmin-with-adl
+
+Installation
+============
+
+Copy adl and then ask it to install itself:
+
+  $ sudo sh ./adl -C Installing adl
+  $ sudo sh ./adl -e /usr/local/bin
+
+The second command will open your editor. Load the contents of the adl script
+into the empty file, save it, and quit your editor.
+
+Finally, make adl executable:
+
+  $ sudo chmod +x /usr/local/bin/adl

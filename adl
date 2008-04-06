@@ -1,0 +1,116 @@
+#!/bin/bash
+#
+# Script for recording administrative commands to a LOG file.
+# An idea stolen from jwz.
+
+
+## Variables
+
+LOG=${RECLOG:-/root/LOG}
+
+# Commands
+DATE=/bin/date
+ECHO=/bin/echo
+EDITOR=${EDITOR:-/usr/bin/vi}
+
+
+## Functions
+
+usage()
+{
+    echo "Usage: $(basename $0) [ (-C|-c) <comment> | -e <file> | <command> ]" 1>&2
+    exit 1
+}
+
+
+line_comment()
+{
+    local comment="$1"
+    local user=$SUDO_USER
+    [ -z "$user" ] && user=$USER
+    cat <<EOF >> $LOG
+# $comment ($user)
+EOF
+}
+
+
+block_comment()
+{
+    local comment="$1"
+    local user=$SUDO_USER
+    [ -z "$user" ] && user=$USER
+    cat <<EOF >> $LOG
+
+##
+# $($DATE +%Y/%m/%d): $comment ($user)
+##
+EOF
+}
+
+
+edit_file()
+{
+    local file="$1"
+    local create=
+    if [ ! -e "$file" ]; then
+	create=1
+	touch "$file"
+    fi
+    cp "$file" "$file.orig"
+    $EDITOR $file
+    echo >> $LOG
+    if [ -n "$create" ]; then
+	echo "cat <<'EOPATCH' > $file" >> $LOG
+	cat $file >> $LOG
+    else
+	echo "patch $file <<'EOPATCH'" >> $LOG
+	diff -u "$file.orig" "$file" >> $LOG || true
+    fi
+    echo "EOPATCH" >> $LOG
+    echo >> $LOG
+    rm -f "$file.orig"
+}
+
+
+run_command()
+{
+    $SHELL -c "$*"
+    echo "$@" >> $LOG
+}
+
+
+## Main Program
+
+set -e
+
+BLOCK_COMMENT=
+EDITABLE_FILE=
+
+while getopts cCe: opt; do
+    case $opt in
+        c)  shift
+            LINE_COMMENT=$*
+            ;;
+	C)  shift
+	    BLOCK_COMMENT=$*
+	    ;;
+	e)  EDITABLE_FILE=$OPTARG
+	    ;;
+    esac
+done
+shift $(( $OPTIND - 1 ))
+
+if [ -n "$LINE_COMMENT" ]; then
+    line_comment "$LINE_COMMENT"
+elif [ -n "$BLOCK_COMMENT" ]; then
+    block_comment "$BLOCK_COMMENT"
+elif [ -n "$EDITABLE_FILE" ]; then
+    if [ -n "$*" ]; then
+	usage
+    fi
+    edit_file "$EDITABLE_FILE"
+elif [ "$#" -gt 0 ]; then
+    run_command "$@"
+else
+    usage
+fi
