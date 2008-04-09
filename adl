@@ -53,18 +53,18 @@ edit_file()
     local file="$1"
     local create=
     if [ ! -e "$file" ]; then
-	create=1
-	touch "$file"
+        create=1
+        touch "$file"
     fi
     cp "$file" "$file.orig"
     $EDITOR $file
     echo >> $LOG
     if [ -n "$create" ]; then
-	echo "cat <<'EOPATCH' > $file" >> $LOG
-	cat $file >> $LOG
+        echo "cat <<'EOPATCH' > $file" >> $LOG
+        cat $file >> $LOG
     else
-	echo "patch $file <<'EOPATCH'" >> $LOG
-	diff -u "$file.orig" "$file" >> $LOG || true
+        echo "patch $file <<'EOPATCH'" >> $LOG
+        diff -u "$file.orig" "$file" >> $LOG || true
     fi
     echo "EOPATCH" >> $LOG
     echo >> $LOG
@@ -91,11 +91,11 @@ while getopts cCe: opt; do
         c)  shift
             LINE_COMMENT=$*
             ;;
-	C)  shift
-	    BLOCK_COMMENT=$*
-	    ;;
-	e)  EDITABLE_FILE=$OPTARG
-	    ;;
+        C)  shift
+            BLOCK_COMMENT=$*
+            ;;
+        e)  EDITABLE_FILE=$OPTARG
+            ;;
     esac
 done
 shift $(( $OPTIND - 1 ))
@@ -106,7 +106,7 @@ elif [ -n "$BLOCK_COMMENT" ]; then
     block_comment "$BLOCK_COMMENT"
 elif [ -n "$EDITABLE_FILE" ]; then
     if [ -n "$*" ]; then
-	usage
+        usage
     fi
     edit_file "$EDITABLE_FILE"
 elif [ "$#" -gt 0 ]; then
