@@ -14,7 +14,7 @@ Installation
 Copy adl and then ask it to install itself:
 
   $ sudo sh ./adl -C Installing adl
-  $ sudo sh ./adl -e /usr/local/bin
+  $ sudo sh ./adl -e /usr/local/bin/adl
 
 The second command will open your editor. Load the contents of the adl script
 into the empty file, save it, and quit your editor.
