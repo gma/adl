@@ -82,6 +82,7 @@ run_command()
 ## Main Program
 
 set -e
+[ -n "$DEBUG" ] && set -x
 
 BLOCK_COMMENT=
 EDITABLE_FILE=
