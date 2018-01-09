@@ -23,13 +23,24 @@ usage()
 }
 
 
+wrap_and_hash_comment()
+{
+    local comment="$1"
+    if command -v fold >/dev/null; then
+        echo $comment | fold -s -w 76 | sed 's/^/# /'
+    else
+        echo "# $comment"
+    fi
+}
+
+
 line_comment()
 {
     local comment="$1"
     local user=$SUDO_USER
     [ -z "$user" ] && user=$USER
     cat <<EOF >> $LOG
-# $comment ($user)
+$(wrap_and_hash_comment "$comment")
 EOF
 }
 
