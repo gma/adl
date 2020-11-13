@@ -85,7 +85,7 @@ edit_file()
 
 run_command()
 {
-    $SHELL -c "$*"
+    /bin/bash -c "$*"
     echo "$@" >> $LOG
 }
 
